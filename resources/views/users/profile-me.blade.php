@@ -5,12 +5,12 @@
 
 <!-- Tab menus -->
 <ul class="nav nav-tabs">
-    <li><a href="/">People</a></li>
-    <li><a href="/postsTab">Speak your mind!</a></li>
+    <li><a href="/users/list">People</a></li>
+    <li><a href="/posts/list">Speak your mind!</a></li>
     <li class="active"><a href="#">Preference</a></li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content" align="center">
     <div id="menu2" class="tab-pane fade in active">
         <div class="container">
             <div class="panel panel-primary">
@@ -35,7 +35,7 @@
                         </div>
                     @endif
 
-                    {!! Form::open(array('action' => 'UserController@updateUser', 'method' => 'post')) !!}
+                    {!! Form::open(['route' => 'users.update']) !!}
 
                         <h1>{!! $user->name !!}</h1> <br>
                         

@@ -4,6 +4,7 @@ use App\Task;
 use App\User;
 use App\Post;
 use App\Guest;
+use App\Reply;
 use Illuminate\Http\Request;
 
 /*
@@ -17,51 +18,79 @@ use Illuminate\Http\Request;
 |
 */
 
-
 Route::get('/', function (Request $request) {
+
+    return redirect()->route('users.list');
+});
+
+Route::post('users/update', 'UserController@updateUser')->name('users.update');
+
+Route::get('/users/list', function (Request $request) {
     $userList = User::orderBy('created_at', 'asc')->get();
 
     $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
 
-    return view('tabs/peopleTab', [
+    return view('users/list', [
         'user' => $user,
         'userList' => $userList
     ]);
     
-});
+})->name('users.list');
 
-Route::get('/postsTab', function (Request $request) {
+Route::get('/users/profile/me', function (Request $request) {
+
+    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+
+    return view('users/profile-me', [
+        'user' => $user,
+    ]);
+
+})->name('users.profile.me');
+
+Route::get('/posts/list', function (Request $request) {
 
     $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
     $posts = Post::all();
 
-    return view('tabs/postsTab', [
+    return view('posts/list', [
         'user' => $user,
         'posts' => $posts
     ]);
     
-});
+})->name('posts.list');
 
-Route::get('/preferenceTab', function (Request $request) {
+Route::get('/posts/details/{id}', function (Request $request) {
+
+    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+    $post = Post::where('id', $request->id)->first();
+    $reply = Reply::where('post_id', $post->id)->get()->first();
+    $reply = $reply == null ? Reply::withPostId($post->id) : $reply;
+    $replies = json_decode($reply->meta);
+
+    return view('posts/details', [
+        'user' => $user,
+        'post' => $post,
+        'replies' => $replies,
+    ]);
+
+})->name('post.details');
+
+Route::post('/posts/create', 'PostController@createPost')->name('posts.create');
+
+Route::post('/replies/create', 'ReplyController@createReplyToPost')->name('replies.create');
+
+Route::post('/replies/create/reply-to-reply', 'ReplyController@createReplyToReply')->name('replies.create-reply-to-reply');
+
+Route::get('/privacy-policy', function (Request $request) {
 
     $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
 
-    return view('tabs/preferenceTab', [
+    return view('info/privacy-policy', [
         'user' => $user,
     ]);
-    
 });
 
-Route::post('/Post/post', 'PostController@postPost')->name('Post.post');
-
-Route::post('user/update', [
-    'uses' => 'UserController@updateUser'
-])->name('user.update');
-
-Route::post('/image/post', 'ImageController@postProfileImage')->name('postProfileImage');
-
-Route::get('/aloha', function (Request $request) {
-    $sparky = $request->session()->get('key');
+Route::get('/ip', function (Request $request) {
     $request->session()->put('key', 'fasd');
     $ip = $_SERVER['REMOTE_ADDR'] ;
     return Response::json($ip);

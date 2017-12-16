@@ -18,7 +18,7 @@ class CreatePostsTable extends Migration
             $table->increments('id');
             $table->string('user_id');
             $table->string('title');
-            $table->string('content');
+            $table->string('detail');
             $table->integer('upvoted');
             $table->integer('views');
             $table->timestamps();

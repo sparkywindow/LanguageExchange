@@ -74,12 +74,33 @@ class User extends Authenticatable
         if($this->getFacebookId() === User::userWithNoFacebookAccount)
             return User::GUEST_PROFILE_PICTURE_URL;
 
-        return "http://graph.facebook.com/" . $this->getFacebookId() . "/picture";
+        return "https://graph.facebook.com/" . $this->getFacebookId() . "/picture?width=200&height=200";
     }
+
+
+    public static function getProfilePictureUrlWithId($userId) {
+
+        if(User::getFacebookIdWithId($userId) === User::userWithNoFacebookAccount)
+            return User::GUEST_PROFILE_PICTURE_URL;
+
+        return "https://graph.facebook.com/" . User::getFacebookIdWithId($userId) . "/picture?width=200&height=200";
+    }
+
 
     private function getFacebookId() {
 
         $facebookAccount = DB::table('social_facebook_accounts')->where('user_id', $this->id)->first();
+
+        if(isset($facebookAccount))
+            return $facebookAccount->provider_user_id;
+        else
+            return User::userWithNoFacebookAccount;
+    }
+
+
+    private static function getFacebookIdWithId($userId) {
+
+        $facebookAccount = DB::table('social_facebook_accounts')->where('user_id', $userId)->first();
 
         if(isset($facebookAccount))
             return $facebookAccount->provider_user_id;

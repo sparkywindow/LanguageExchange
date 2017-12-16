@@ -24,26 +24,23 @@ class PostController extends Controller
     * 
     */
     // get image from upload-image page 
-    public function postPost(Request $request)
+    public function createPost(Request $request)
     {
         $this->validate($request, [
             'title' => 'required|max:2048',
             'detail' => 'required|max:2048',
         ]);
 
-        $post = new Post;
-        $post->user_id = Auth::user()->id;
-        $post->title = $request->title;
-        $post->content = $request->detail;
-        $post->upvoted = 0;
-        $post->views = 0;
-
-//        var_dump($post); exit();
+        $post = Post::withUserIdTitleAndDetail(
+            Auth::user()->id,
+            $request->title,
+            $request->detail
+        );
 
         $post->save();
 
         return redirect()
-            ->to('/postsTab')
+            ->to('/posts/list')
             ->with('success','Post has been uploaded successfully.');
     }
 

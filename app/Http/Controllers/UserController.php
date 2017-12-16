@@ -41,7 +41,7 @@ class UserController extends Controller
         User::find(Auth::user()->id)->update($user);
 
         return redirect()
-            ->to('/preferenceTab')
+            ->to('/users/profile/me')
             ->with('success', 'Profile has been successfully updated');
 
     }

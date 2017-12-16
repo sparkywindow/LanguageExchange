@@ -15,20 +15,15 @@ class CreateRepliesTable extends Migration
     protected $fillable = [
         'id',
         'post_id',
-        'user_id',
-        'content',
-        'replies_to_reply',
-        'upvoted',
+        'meta',
     ];
 
     public function up()
     {
         Schema::create('replies', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('post_id');
-            $table->string('user_id');
-            $table->string('content');
-            $table->json('replies_to_reply');
+            $table->string('post_id')->unique();
+            $table->json('meta');
             $table->timestamps();
         });
     }
