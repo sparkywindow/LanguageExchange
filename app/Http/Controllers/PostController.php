@@ -27,14 +27,12 @@ class PostController extends Controller
     public function createPost(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required|max:2048',
-            'detail' => 'required|max:2048',
+            'msg' => 'required|max:2048',
         ]);
 
         $post = Post::withUserIdTitleAndDetail(
             Auth::user()->id,
-            $request->title,
-            $request->detail
+            $request->msg
         );
 
         $post->save();

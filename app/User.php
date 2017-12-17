@@ -78,12 +78,17 @@ class User extends Authenticatable
     }
 
 
-    public static function getProfilePictureUrlWithId($userId) {
+    public static function getProfilePictureUrlWithId($userId, $size = array("width" => 200, "height" => 200)) {
 
         if(User::getFacebookIdWithId($userId) === User::userWithNoFacebookAccount)
             return User::GUEST_PROFILE_PICTURE_URL;
 
-        return "https://graph.facebook.com/" . User::getFacebookIdWithId($userId) . "/picture?width=200&height=200";
+        return "https://graph.facebook.com/" .
+            User::getFacebookIdWithId($userId) .
+            "/picture?width=" .
+            $size['width'] .
+            "&height=" .
+            $size['height'];
     }
 
 
@@ -98,7 +103,8 @@ class User extends Authenticatable
     }
 
 
-    private static function getFacebookIdWithId($userId) {
+    private static function getFacebookIdWithId(string $userId)
+    {
 
         $facebookAccount = DB::table('social_facebook_accounts')->where('user_id', $userId)->first();
 
@@ -106,5 +112,10 @@ class User extends Authenticatable
             return $facebookAccount->provider_user_id;
         else
             return User::userWithNoFacebookAccount;
+    }
+
+    public static function getUserNameWithId(string $userId)
+    {
+        return User::where('id', $userId)->first()->name;
     }
 }

@@ -9,8 +9,7 @@ class Post extends Model
     protected $fillable = [
         'id',
         'user_id',
-        'title',
-        'detail',
+        'msg',
         'upvoted',
         'views',
     ];
@@ -24,12 +23,11 @@ class Post extends Model
     /*
      * Helper function to create Post with just title, and detail.
      */
-    public static function withUserIdTitleAndDetail(string $userId, string $title, string $detail) {
+    public static function withUserIdTitleAndDetail(string $userId, string $msg) {
 
         $instance = new static();
         $instance->user_id = $userId;
-        $instance->title = $title;
-        $instance->detail = $detail;
+        $instance->msg = $msg;
 
         return $instance;
     }

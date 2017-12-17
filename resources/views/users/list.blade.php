@@ -14,12 +14,13 @@
     <div id="home" class="tab-pane fade in active">
         <h3>List of People</h3>
         @foreach ($userList as $anotherUser)
-                <img src= {{ $anotherUser->getProfilePictureUrl() }} class="img-thumbnail" alt="Cinque Terre" height="200" width="200"> <br>
+            <div style="background-color: #ebeeef; margin:30px">
+                <img src= {{ $anotherUser->getProfilePictureUrl() }} class="img-thumbnail" alt="Cinque Terre"> <br>
                 <a href={{ $anotherUser->facebookPageUrl() }}> Name : {{ $anotherUser->name }} <br> </a>
                 Native Language : {{ $anotherUser->nativeLanguage }} <br>
                 Learning Language : {{ $anotherUser->learningLanguage }} <br>
                 City : {{ $anotherUser->city }} <br>
-
+            </div>
         @endforeach
     </div>
 </div>

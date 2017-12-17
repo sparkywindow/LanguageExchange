@@ -16,18 +16,18 @@
 
         {!! Form::open(['route' => 'posts.create']) !!}
 
-            Title: {!! Form::text('title') !!}
-            Detail: {!! Form::text('detail') !!}
+            Message: {!! Form::text('msg') !!}
             {!! Form::submit('update') !!}
 
         {!! Form::close() !!}
 
         @foreach($posts as $post)
-            <a href="/posts/details/{{$post->id}}">
-                ID : {{ $post->user_id }} <br>
-                Title : {{ $post->title }} <br>
-                Detail: {{ $post->detail }} <br>
-            </a>
+            <div align="left" style="max-width: 400px; background-color: #fcfdfd; margin:30px; border-radius:20px; border:3px; border-style:solid; border-color: #d4d4d4; padding:15px;">
+                <a href="/posts/details/{{$post->id}}">
+                    <img src="{{ Helper::getProfilePictureUrlWithId($post->user_id, array('width' => 50, 'height' => 50)) }}" style="border-radius:30px"> {{ Helper::getUserNameWithId($post->user_id) }}
+                    <h1> {{ $post->msg }} </h1> <br>
+                </a>
+            </div>
         @endforeach
     </div>
 </div>

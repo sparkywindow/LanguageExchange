@@ -50,7 +50,7 @@ Route::get('/users/profile/me', function (Request $request) {
 Route::get('/posts/list', function (Request $request) {
 
     $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-    $posts = Post::all();
+    $posts = Post::orderBy('id', 'desc')->get();
 
     return view('posts/list', [
         'user' => $user,
@@ -89,6 +89,11 @@ Route::get('/privacy-policy', function (Request $request) {
         'user' => $user,
     ]);
 });
+
+/**
+ * The code below is unrelated to the project.
+ * Just left in here for reference for learning.
+ */
 
 Route::get('/ip', function (Request $request) {
     $request->session()->put('key', 'fasd');

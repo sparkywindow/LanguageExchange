@@ -14,9 +14,7 @@
     <div id="menu1" class="tab-pane fade in active">
         <h1>
             <img src="{{ $user->getProfilePictureUrl() }}">
-            {{ Helper::aloha() }}
-            Title: {{ $post->title }}
-            Detail: {{ $post->detail }} <br>
+            {{ $post->msg }} <br>
         </h1>
     </div>
 
@@ -33,8 +31,11 @@
 
     @foreach($replies as $index => $reply)
 
-        <h2> Message : {{ $reply->msg }} </h2> <br>
-        {{ var_dump($reply->repliesToThis) }}
+        <h2> <img src="{{ Helper::getProfilePictureUrlWithId($reply->user_id, array('width' => 50, 'height' => 50)) }}"> {{ $reply->msg }} </h2> <br>
+        @foreach($reply->repliesToThis as $replyToReply)
+            <img src="{{ Helper::getProfilePictureUrlWithId($replyToReply->user_id, array('width' => 30, 'height' => 30)) }}">
+            {{ $replyToReply->msg }} <br>
+        @endforeach
 
         {!! Form::open(['route' => 'replies.create-reply-to-reply']) !!}
 
