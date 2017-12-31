@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Validator;
 
 class Post extends Model
 {
@@ -20,10 +21,14 @@ class Post extends Model
         $this->views = 0;
     }
 
-    /*
-     * Helper function to create Post with just title, and detail.
+    /**
+     * Alternative Constructor
+     *
+     * @param string $userId
+     * @param string $msg
+     * @return Post
      */
-    public static function withUserIdTitleAndDetail(string $userId, string $msg) {
+    public static function withUserIdAndMsg(string $userId, string $msg) : Post {
 
         $instance = new static();
         $instance->user_id = $userId;

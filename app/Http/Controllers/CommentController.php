@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
-use App\Reply;
+use App\Comment;
 
-class ReplyController extends Controller
+class CommentController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -15,28 +15,25 @@ class ReplyController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+
     }
 
     /**
     *
     *
     */
-    public function createReplyToPost(Request $request)
+    public function commentToPost(Request $request)
     {
         $this->validate($request, [
             'post_id' => 'required|max:2048',
             'msg' => 'required|max:2048',
         ]);
 
-        //check and create a post if it does not exist
-        $reply= Reply::where('post_id', $request->post_id)->first();
-        if($reply == null)
-            $reply = Reply::withPostId($request->post_id);
+        $ownerId = Auth::user()->id;
 
-        $reply = $reply->addReplyToPost(Auth::user()->id, $request->msg);
+        $comment = Comment::asComment($request->post_id, $ownerId, $request->msg);
 
-        $reply->save();
+        $comment->save();
 
         return redirect()
             ->to('/posts/details/' . $request->post_id)
@@ -47,25 +44,17 @@ class ReplyController extends Controller
      *
      *
      */
-    public function createReplyToReply(Request $request)
+    public function replyToComment(Request $request)
     {
         $this->validate($request, [
             'post_id' => 'required|max:2048',
+            'reply_parent_id' => 'required|max:2048',
             'msg' => 'required|max:2048',
-            'replySequence' => 'required|max:2048',
         ]);
 
-        $reply= Reply::where('post_id', $request->post_id)->first();
+        $comment= Comment::asReply($request->post_id, Auth::user()->id , $request->msg, $request->reply_parent_id);
 
-        //@todo if reply does not exist, do something
-
-        $reply = $reply->addReplyToReply(
-            Auth::user()->id,
-            $request->msg,
-            $request->replySequence
-        );
-
-        $reply->save();
+        $comment->save();
 
         return redirect()
             ->to('/posts/details/' . $request->post_id)

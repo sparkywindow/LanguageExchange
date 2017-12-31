@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 use App\User;
+use App\Guest;
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 
 class UserController extends Controller
 {
@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+
     }
 
     /**
@@ -43,7 +43,27 @@ class UserController extends Controller
         return redirect()
             ->to('/users/profile/me')
             ->with('success', 'Profile has been successfully updated');
+    }
 
+    public function listUsers()
+    {
+        $userList = User::orderBy('created_at', 'asc')->get();
+
+        $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+
+        return view('users/list', [
+            'user' => $user,
+            'userList' => $userList
+        ]);
+    }
+
+    public function getMyProfile()
+    {
+        $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+
+        return view('users/profile-me', [
+            'user' => $user,
+        ]);
     }
 
 }

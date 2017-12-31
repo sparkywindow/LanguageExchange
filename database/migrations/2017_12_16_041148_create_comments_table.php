@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRepliesTable extends Migration
+class CreateCommentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,15 +15,19 @@ class CreateRepliesTable extends Migration
     protected $fillable = [
         'id',
         'post_id',
-        'meta',
+        'reply_parent_id',
+        'owner_id',
+        'msg'
     ];
 
     public function up()
     {
-        Schema::create('replies', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('post_id')->unique();
-            $table->json('meta');
+            $table->integer('post_id');
+            $table->integer('reply_parent_id');
+            $table->integer('owner_id');
+            $table->longText('msg');
             $table->timestamps();
         });
     }
@@ -35,6 +39,6 @@ class CreateRepliesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('replies');
+        Schema::dropIfExists('comments');
     }
 }

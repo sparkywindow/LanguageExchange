@@ -14,11 +14,6 @@ class Guest extends User
         $this->city = 'Seoul';
     }
 
-    public function getProfilePictureUrl() {
-
-        return User::GUEST_PROFILE_PICTURE_URL;
-    }
-
     public function isGuest() {
 
         return true;

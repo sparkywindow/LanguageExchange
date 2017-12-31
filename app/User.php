@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    const GUEST_PROFILE_PICTURE_URL = "/images/Guest.png";
+    const GUEST_PROFILE_PICTURE_URL = "/images/Guest";
     const userWithNoFacebookAccount = 0;
 
     /**
@@ -69,10 +69,10 @@ class User extends Authenticatable
         );
     }
 
-    public function getProfilePictureUrl() {
+    public function getProfilePictureUrl($size = array("width" => 200, "height" => 200)) {
 
         if($this->getFacebookId() === User::userWithNoFacebookAccount)
-            return User::GUEST_PROFILE_PICTURE_URL;
+            return User::getGuestProfilePictureUrl($size);
 
         return "https://graph.facebook.com/" . $this->getFacebookId() . "/picture?width=200&height=200";
     }
@@ -81,7 +81,7 @@ class User extends Authenticatable
     public static function getProfilePictureUrlWithId($userId, $size = array("width" => 200, "height" => 200)) {
 
         if(User::getFacebookIdWithId($userId) === User::userWithNoFacebookAccount)
-            return User::GUEST_PROFILE_PICTURE_URL;
+            return User::getGuestProfilePictureUrl($size);
 
         return "https://graph.facebook.com/" .
             User::getFacebookIdWithId($userId) .
@@ -89,6 +89,11 @@ class User extends Authenticatable
             $size['width'] .
             "&height=" .
             $size['height'];
+    }
+
+    public static function getGuestProfilePictureUrl($size)
+    {
+        return User::GUEST_PROFILE_PICTURE_URL . $size['width'] . '.png';
     }
 
 

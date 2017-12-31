@@ -1,10 +1,5 @@
 <?php
 
-use App\Task;
-use App\User;
-use App\Post;
-use App\Guest;
-use App\Reply;
 use Illuminate\Http\Request;
 
 /*
@@ -18,109 +13,47 @@ use Illuminate\Http\Request;
 |
 */
 
+/**
+ * Map the landing page to the User List.
+ */
 Route::get('/', function (Request $request) {
 
-    return redirect()->route('users.list');
-});
-
-Route::post('users/update', 'UserController@updateUser')->name('users.update');
-
-Route::get('/users/list', function (Request $request) {
-    $userList = User::orderBy('created_at', 'asc')->get();
-
-    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-
-    return view('users/list', [
-        'user' => $user,
-        'userList' => $userList
-    ]);
-    
-})->name('users.list');
-
-Route::get('/users/profile/me', function (Request $request) {
-
-    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-
-    return view('users/profile-me', [
-        'user' => $user,
-    ]);
-
-})->name('users.profile.me');
-
-Route::get('/posts/list', function (Request $request) {
-
-    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-    $posts = Post::orderBy('id', 'desc')->get();
-
-    return view('posts/list', [
-        'user' => $user,
-        'posts' => $posts
-    ]);
-    
-})->name('posts.list');
-
-Route::get('/posts/details/{id}', function (Request $request) {
-
-    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-    $post = Post::where('id', $request->id)->first();
-    $reply = Reply::where('post_id', $post->id)->get()->first();
-    $reply = $reply == null ? Reply::withPostId($post->id) : $reply;
-    $replies = json_decode($reply->meta);
-
-    return view('posts/details', [
-        'user' => $user,
-        'post' => $post,
-        'replies' => $replies,
-    ]);
-
-})->name('post.details');
-
-Route::post('/posts/create', 'PostController@createPost')->name('posts.create');
-
-Route::post('/replies/create', 'ReplyController@createReplyToPost')->name('replies.create');
-
-Route::post('/replies/create/reply-to-reply', 'ReplyController@createReplyToReply')->name('replies.create-reply-to-reply');
-
-Route::get('/privacy-policy', function (Request $request) {
-
-    $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-
-    return view('info/privacy-policy', [
-        'user' => $user,
-    ]);
+        return redirect()->route('users.list');
 });
 
 /**
- * The code below is unrelated to the project.
- * Just left in here for reference for learning.
+ * users routes
  */
 
-Route::get('/ip', function (Request $request) {
-    $request->session()->put('key', 'fasd');
-    $ip = $_SERVER['REMOTE_ADDR'] ;
-    return Response::json($ip);
+Route::get('/users/list', 'UserController@listUsers')->name('users.list');
+
+Route::get('/users/profile/me', 'UserController@getMyProfile')->name('users.profile.me');
+
+Route::group(['middleware' => 'auth'], function() {
+
+    Route::post('users/update', 'UserController@updateUser')->name('users.update');
 });
 
-Route::delete('/task/{id}', function ($id) {
-    Task::findOrFail($id)->delete();
+/**
+ * posts routes
+ */
 
-    return redirect('/');
+Route::get('/posts/list', 'PostController@listPosts')->name('posts.list');
+
+Route::get('/posts/details/{id}', 'PostController@getPostDetails')->name('post.details');
+
+Route::group(['middleware' => 'auth'], function() {
+
+    Route::post('/posts/create', 'PostController@createPost')->name('posts.create');
 });
 
-Route::post('/task', function (Request $request) {
-    $validator = Validator::make($request->all(), [
-        'name' => 'required|max:255',
-    ]);
+/**
+ * comments routes
+ */
 
-    if ($validator->fails()) {
-        return redirect('/')
-            ->withInput()
-            ->withErrors($validator);
-    }
+Route::group(['middleware' => 'auth'], function() {
 
-    $task = new Task;
-    $task->name = $request->name;
-    $task->save();
+    Route::post('/comments/create', 'CommentController@commentToPost')->name('comments.create');
 
-    return redirect('/');
-})->middleware('auth');
+    Route::post('/comments/reply-to-comment', 'CommentController@replyToComment')->name('comments.reply-to-comment');
+});

@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-// use Laravel\Socialite\Facades\Socialite;
+use App\Services\SocialFacebookAccountService;
 use Socialite;
 
 class SocialAuthFacebookController extends Controller
@@ -26,6 +24,17 @@ class SocialAuthFacebookController extends Controller
     {
         $user = $service->createOrGetUser(Socialite::driver('facebook')->user());
         auth()->login($user);
+        return redirect()->to('/');
+    }
+
+    /**
+     * Log out and redirect to landing page.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logout()
+    {
+        auth()->logout();
         return redirect()->to('/');
     }
 }

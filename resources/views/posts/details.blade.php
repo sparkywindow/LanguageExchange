@@ -13,40 +13,49 @@
 <div class="tab-content" align="center">
     <div id="menu1" class="tab-pane fade in active">
         <h1>
-            <img src="{{ $user->getProfilePictureUrl() }}">
+            <img src="{{ Helper::getProfilePictureUrlWithId($post->user_id, array('width' => 200, 'height' => 200)) }}">
             {{ $post->msg }} <br>
         </h1>
     </div>
 
-        {!! Form::open(['route' => 'replies.create']) !!}
+        {!! Form::open(['route' => 'comments.create']) !!}
 
             <br><br>
             Post Id {!! Form::hidden('post_id', $post->id) !!}
             Msg: {!! Form::text('msg') !!}
-            {!! Form::submit('Leave a Reply') !!}
+            {!! Form::submit('Comment') !!}
 
         {!! Form::close() !!}
 
     <br><br>
 
-    @foreach($replies as $index => $reply)
+    @foreach($comments as $index => $comment)
 
-        <h2> <img src="{{ Helper::getProfilePictureUrlWithId($reply->user_id, array('width' => 50, 'height' => 50)) }}"> {{ $reply->msg }} </h2> <br>
-        @foreach($reply->repliesToThis as $replyToReply)
-            <img src="{{ Helper::getProfilePictureUrlWithId($replyToReply->user_id, array('width' => 30, 'height' => 30)) }}">
-            {{ $replyToReply->msg }} <br>
-        @endforeach
+        @if($comment->reply_parent_id === -1)
 
-        {!! Form::open(['route' => 'replies.create-reply-to-reply']) !!}
+            <h2> <img src="{{ Helper::getProfilePictureUrlWithId($comment->owner_id, array('width' => 50, 'height' => 50)) }}"> {{ $comment->msg }} </h2> <br>
+
+            {!! Form::open(['route' => 'comments.reply-to-comment']) !!}
 
             {!! Form::hidden('post_id', $post->id) !!}
-            {!! Form::hidden('replySequence', $index) !!}
-            Msg: {!! Form::text('msg') !!}
+            {!! Form::hidden('reply_parent_id', $comment->id) !!}
 
-            {!! Form::submit('Reply to Reply') !!}
+                Msg: {!! Form::text('msg') !!}
 
-        {!! Form::close() !!}
-        <br><br><br>
+            {!! Form::submit('Comment') !!}
+
+            {!! Form::close() !!}
+            <br>
+
+            @foreach($repliesToComments as $reply)
+
+                @if($reply->reply_parent_id === $comment->id)
+                    <h3> <img src="{{ Helper::getProfilePictureUrlWithId($reply->owner_id, array('width' => 30, 'height' => 30)) }}"> {{ $reply->msg }} </h3> <br>
+                @endif
+            @endforeach
+
+        @endif
+
     @endforeach
 
 </div>
