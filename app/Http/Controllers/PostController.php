@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\PostLike;
 use Illuminate\Http\Request;
 use Auth;
 use App\Post;
@@ -55,13 +56,44 @@ class PostController extends Controller
         $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
         $posts = Post::orderBy('id', 'desc')->get();
 
-        $comments = array();
+        $likes = array();
+
+        foreach($posts as $post) {
+            $like = PostLike::getLike($post->id);
+            array_push($likes, $like);
+        }
 
         return view('posts/list', [
             'user' => $user,
             'posts' => $posts,
-            'comments' => $comments
+            'likes' => $likes
         ]);
+    }
+
+    /**
+     * List every post
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function listPostsJSON()
+    {
+        $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+        $posts = Post::orderBy('id', 'desc')->get();
+
+        $likes = array();
+
+        foreach($posts as $post) {
+            $like = PostLike::getLike($post->id);
+            array_push($likes, $like);
+        }
+
+        $response = array(
+            'user' => $user,
+            'posts' => $posts,
+            'likes' => $likes
+        );
+
+        return response()->json($response);
     }
 
     /**

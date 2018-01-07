@@ -28,7 +28,7 @@ class CreateUsersTable extends Migration
             $table->integer('numberOfActions')->default(0);
             $table->integer('numberOfBestAnswers')->default(0);
             $table->integer('numberOfFavorites')->default(0);
-            
+
             $table->rememberToken();
             $table->timestamps();
         });

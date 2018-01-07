@@ -28,7 +28,7 @@ class Post extends Model
      * @param string $msg
      * @return Post
      */
-    public static function withUserIdAndMsg(string $userId, string $msg) : Post {
+    public static function withUserIdAndMsg(int $userId, string $msg) : Post {
 
         $instance = new static();
         $instance->user_id = $userId;

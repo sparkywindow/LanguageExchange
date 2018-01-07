@@ -40,6 +40,8 @@ Route::group(['middleware' => 'auth'], function() {
 
 Route::get('/posts/list', 'PostController@listPosts')->name('posts.list');
 
+Route::get('/posts/list/json', 'PostController@listPostsJSON')->name('posts.list.json');
+
 Route::get('/posts/details/{id}', 'PostController@getPostDetails')->name('post.details');
 
 Route::group(['middleware' => 'auth'], function() {
@@ -56,4 +58,16 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('/comments/create', 'CommentController@commentToPost')->name('comments.create');
 
     Route::post('/comments/reply-to-comment', 'CommentController@replyToComment')->name('comments.reply-to-comment');
+});
+
+/**
+ * likes routes
+ */
+
+Route::group(['middleware' => 'auth'], function() {
+
+    Route::post('/likes/create', 'LikeController@addLike')->name('likes.add');
+
+    Route::post('/likes/delete', 'LikeController@deleteLike')->name('likes.delete');
+
 });

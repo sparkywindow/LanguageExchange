@@ -21,31 +21,58 @@
 
         {!! Form::close() !!}
 
-        @foreach($posts as $key => $post)
-            <div align="left" style="max-width: 400px; word-wrap: break-word; background-color: #fcfdfd; margin-left:10px; margin-right:10px; margin-top:30px; border-radius:10px; border:3px; border-style:solid; border-color: #d4d4d4; padding:15px;">
-                <a href="/posts/details/{{$post->id}}">
-                    <img src="{{ Helper::getProfilePictureUrlWithId($post->user_id, array('width' => 50, 'height' => 50)) }}" style="border-radius:30px">
-                    {{ Helper::getUserNameWithId($post->user_id) }}
-                    <p1><h1> {{ $post->msg }} </h1></p1> <br>
-                </a>
-            </div>
-            @foreach($comments as $comment)
-                <div align="left" style="max-width: 400px; word-wrap: break-word; margin-left:10px; margin-right:10px; background-color: #f9f2f4;  border-radius:3px; border:3px; border-style:solid; border-color: #d4d4d4; padding:15px;">
-                    <img src="{{ Helper::getProfilePictureUrlWithId($comment->user_id, array('width' => 30, 'height' => 30)) }}" style="border-radius:30px">
-                    {{ Helper::getUserNameWithId($comment->user_id) }}
-                    {{ $comment->msg }} <br>
+        <div id="app">
+            <div v-for="(post, index) in posts">
+                <div align="left" style="max-width: 400px; word-wrap: break-word; background-color: #fcfdfd; margin-left:10px; margin-right:10px; margin-top:30px; border-radius:10px; border:3px; border-style:solid; border-color: #d4d4d4; padding:15px;">
+                    <a v-bind:href="postDetailsUrl(post.id)">
+                        <img src="https://graph.facebook.com/10155879106934254/picture?width=50&height=50" style="border-radius:30px">
+                        @{{ user.name }}
+                        <p1><h1> @{{ post.msg }} </h1></p1> <br>
+                    </a>
+                    Likes : @{{ JSON.parse(likes[index].user_names_json).length }}
 
-                    {{--@foreach($reply->repliesToThis as $replyToReply)--}}
-                        {{--<div style="height:20px">--}}
-                            {{--<img src="{{ Helper::getProfilePictureUrlWithId($reply->user_id, array('width' => 30, 'height' => 30)) }}" width="20" style="border-radius:30px; margin-left:50px">--}}
-                            {{--{{ $replyToReply->msg }}--}}
-                        {{--</div><br>--}}
-                    {{--@endforeach--}}
                 </div>
-            @endforeach
+            </div>
+            <button v-on:click="printstuff">printstuff</button>
+        </div>
+        s
+        <script>
+            var app = new Vue({
+                el: '#app',
+                mounted: function() {
+                    this.loadData();
+                    console.log("mounted");
+                },
+                data: {
+                    posts:[],
+                    likes:[],
+                    user:[],
+                    postDetailsUrl: function(postId) {
+                        return '/posts/details/' + postId;
+                    },
+                },
+                methods: {
+                    printstuff: function() {
+                        JSON.parse(this.likes[0].user_names_json);
+                    },
+                    loadData: function() {
+                        $.ajax({
+                            url: '/posts/list/json',
+                            type: 'GET',
+                            data: {_token: $('meta[name="csrf-token"]').attr('content')},
+                            dataType: 'JSON',
+                            success: function (data) {
+                                this.posts = data.posts;
+                                this.likes = data.likes;
+                                this.user =  data.user;
+                            }.bind(this)
+                        });
+                    },
+                }
 
-            {{--@todo Write a reply to reply --}}
-        @endforeach
+            })
+        </script>
+
     </div>
 </div>
 @endsection
