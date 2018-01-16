@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
  */
 Route::get('/', function (Request $request) {
 
-        return redirect()->route('users.list');
+        return redirect()->route('posts.list');
 });
 
 /**
@@ -38,11 +38,11 @@ Route::group(['middleware' => 'auth'], function() {
  * posts routes
  */
 
-Route::get('/posts/list', 'PostController@listPosts')->name('posts.list');
+Route::get('/posts/list', 'PostController@listPostsView')->name('posts.list');
 
 Route::get('/posts/list/json', 'PostController@listPostsJSON')->name('posts.list.json');
 
-Route::get('/posts/details/{id}', 'PostController@getPostDetails')->name('post.details');
+Route::get('/posts/details/{id}', 'PostController@getPostDetailsView')->name('post.details');
 
 Route::group(['middleware' => 'auth'], function() {
 
@@ -66,8 +66,8 @@ Route::group(['middleware' => 'auth'], function() {
 
 Route::group(['middleware' => 'auth'], function() {
 
-    Route::post('/likes/create', 'LikeController@addLike')->name('likes.add');
+    Route::post('/likes/like', 'LikeController@like')->name('likes.like');
 
-    Route::post('/likes/delete', 'LikeController@deleteLike')->name('likes.delete');
+    Route::post('/likes/unlike', 'LikeController@unlike')->name('likes.unlike');
 
 });

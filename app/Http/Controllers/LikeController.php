@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CommentLike;
 use App\PostLike;
-use App\Like;
+use App\Guest;
 use Illuminate\Http\Request;
 use Auth;
 
@@ -16,6 +16,8 @@ class LikeController extends Controller
      */
     const COMMENT_TYPE = "comment";
 
+    private $user;
+
     /**
      * Create a new controller instance.
      *
@@ -23,28 +25,33 @@ class LikeController extends Controller
      */
     public function __construct()
     {
+        $this->user = (Auth::user() === NULL) ? new Guest() : Auth::user();
 
     }
 
-    public function addLike(Request $request)
+    public function like(Request $request)
     {
+        $this->validate($request, [
+            'likeType' => 'required|max:2048',
+            'targetId' => 'required|max:2048',
+        ]);
+
+        $like = ($request->likeType === LikeController::COMMENT_TYPE) ? new CommentLike() : new PostLike();
+        $like = $like->like($request->targetId, $this->user->id);
+
         $response = array(
             'status' => 'success',
-            'msg' => 'aloha',
+            'like' => $like,
         );
         return response()->json($response);
-
-//        $like = $likeType === LikeController::COMMENT_TYPE ? new CommentLike() : new PostLike();
-//
-//        return $like->addLike($targetId, $userId);
     }
 
-    public function removeLike(int $targetId, int $userId, string $likeType) : int
+    public function unlike(int $targetId, int $userId, string $likeType) : int
     {
         if($likeType === LikeController::COMMENT_TYPE)
-            CommentLike::unLike($targetId, $userId);
+            CommentLike::unlike($targetId, $userId);
         else
-            PostLike::unLike($targetId, $userId);
+            PostLike::unlike($targetId, $userId);
     }
 
 

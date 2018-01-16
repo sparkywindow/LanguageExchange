@@ -68,4 +68,9 @@ class Comment extends Model
         return $instance;
     }
 
+    public static function getNumberOfCommentsForPost(int $postId)
+    {
+        return Comment::where('post_id', $postId)->count();
+    }
+
 }

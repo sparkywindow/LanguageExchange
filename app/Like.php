@@ -17,13 +17,13 @@ abstract class Like extends Model
 
     }
 
-    abstract static function getLike(int $parent) : Like;
+    abstract static function getLike(int $parent);
 
-    abstract static function saveLike(Like $like, int $targetId) : bool;
+//    abstract static function saveLike(Like $like, int $targetId) : bool;
 
-    public static function addLike(int $targetId, int $userId) : bool
+    public function like(int $targetId, int $userId) : Like
     {
-        $like = Like::getLike($targetId);
+        $like = $this->getLike($targetId, $userId);
 
         $names = json_decode($like->user_names_json);
 
@@ -33,12 +33,14 @@ abstract class Like extends Model
 
         $like->user_names_json = json_encode($names);
 
-        return Like::saveLike($like, $targetId);
+        $like->save();
+
+        return $like;
     }
 
-    public static function unLike(int $targetId, int $userId) : bool
+    public function unlike(int $targetId, int $userId) : bool
     {
-        $like = Like::getLike($targetId);
+        $like = $this->getLike($targetId);
 
         $names = json_decode($like->user_names_json);
 
@@ -46,12 +48,12 @@ abstract class Like extends Model
 
         $like->user_names_json = json_encode($names);
 
-        return Like::saveLike($like, $targetId);
+        return $this->saveLike($like, $targetId);
     }
 
-    public static function checkIfLiked(int $targetId, int $userId) :bool
+    public function checkIfLiked(int $targetId, int $userId) :bool
     {
-        $like = Like::getLike($targetId);
+        $like = $this->getLike($targetId);
 
         return in_array(json_decode($like->user_names_json), $userId);
     }

@@ -5,9 +5,9 @@
         
 <!-- Tab menus -->
 <ul class="nav nav-tabs">
-    <li><a href="/">People</a></li>
-    <li class="active"><a href="/posts/list">Speak your mind!</a></li>
-    <li><a href="/users/profile/me">Preference</a></li>
+    <li><a href="/">사람들</a></li>
+    <li class="active"><a href="/posts/list">공부합시다</a></li>
+    <li><a href="/users/profile/me">개인설정</a></li>
 </ul>
 
 <div class="tab-content" align="left" style="overflow-wrap: break-word; margin:20px; ">

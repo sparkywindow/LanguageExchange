@@ -11,14 +11,17 @@ use App\Guest;
 
 class PostController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
+    private $PostLike;
+    private $user;
 
+    /**
+     * PostController constructor.
+     * @param PostLike $postLike
+     */
+    public function __construct(PostLike $postLike)
+    {
+        $this->PostLike = $postLike;
+        $this->user = (Auth::user() === NULL) ? new Guest() : Auth::user();
     }
 
     /**
@@ -35,7 +38,7 @@ class PostController extends Controller
         ]);
 
         $post = Post::withUserIdAndMsg(
-            Auth::user()->id,
+            $this->user->id,
             $request->msg
         );
 
@@ -51,46 +54,41 @@ class PostController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function listPosts()
+    public function listPostsView()
     {
-        $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
-        $posts = Post::orderBy('id', 'desc')->get();
-
-        $likes = array();
-
-        foreach($posts as $post) {
-            $like = PostLike::getLike($post->id);
-            array_push($likes, $like);
-        }
-
         return view('posts/list', [
-            'user' => $user,
-            'posts' => $posts,
-            'likes' => $likes
+            'user' => $this->user,
         ]);
     }
 
     /**
-     * List every post
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Http\JsonResponse
      */
     public function listPostsJSON()
     {
-        $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
         $posts = Post::orderBy('id', 'desc')->get();
 
         $likes = array();
+        $numberOfComments = array();
+        $firstComments = array();
 
         foreach($posts as $post) {
             $like = PostLike::getLike($post->id);
             array_push($likes, $like);
+
+            $firstComment = Comment::where('post_id', $post->id)->get()->first();
+            array_push($firstComments, $firstComment ? $firstComment->msg : "");
+
+            $numberOfCommentsForThePost = Comment::getNumberOfCommentsForPost($post->id);
+            array_push($numberOfComments, $numberOfCommentsForThePost);
         }
 
         $response = array(
-            'user' => $user,
+            'user' => $this->user,
             'posts' => $posts,
-            'likes' => $likes
+            'likes' => $likes,
+            'numberOfComments' => $numberOfComments,
+            'firstComments' => $firstComments
         );
 
         return response()->json($response);
@@ -102,15 +100,14 @@ class PostController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getPostDetails(Request $request)
+    public function getPostDetailsView(Request $request)
     {
-        $user = (Auth::user() === NULL) ? new Guest() : Auth::user();
         $post = Post::where('id', $request->id)->first();
         $comments = Comment::where('post_id', $request->id)->get();
         $repliesToComments = Comment::where('post_id', $request->id)->where('reply_parent_id', '<>', '-1')->get();
 
         return view('posts/details', [
-            'user' => $user,
+            'user' => $this->user,
             'post' => $post,
             'comments' => $comments,
             'repliesToComments' => $repliesToComments

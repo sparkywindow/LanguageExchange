@@ -16,15 +16,15 @@ class CommentLike extends Like
 
     }
 
-    static function getLike(int $targetId) : Like
+    static function getLike(int $targetId)
     {
         return CommentLike::where('target_id', $targetId)->get()->first();
     }
 
-    static function saveLike(Like $like, int $targetId) : bool
-    {
-        $like = CommentLike::getLike($targetId);
-
-        return CommentLike::where('target_id', $targetId)->update($like);
-    }
+//    static function saveLike(Like $like, int $targetId) : bool
+//    {
+//        $like = CommentLike::getLike($targetId);
+//
+//        return CommentLike::where('target_id', $targetId)->update($like);
+//    }
 }

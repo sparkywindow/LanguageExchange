@@ -5,9 +5,9 @@
 
 <!-- Tab menus -->
 <ul class="nav nav-tabs">
-    <li><a href="/users/list">People</a></li>
-    <li><a href="/posts/list">Speak your mind!</a></li>
-    <li class="active"><a href="#">Preference</a></li>
+    <li><a href="/users/list">사람들</a></li>
+    <li><a href="/posts/list">공부합시다</a></li>
+    <li class="active"><a href="#">개인설정</a></li>
 </ul>
 
 <div class="tab-content" align="center">
