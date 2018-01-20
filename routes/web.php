@@ -27,11 +27,11 @@ Route::get('/', function (Request $request) {
 
 Route::get('/users/list', 'UserController@listUsers')->name('users.list');
 
-Route::get('/users/profile/me', 'UserController@getMyProfile')->name('users.profile.me');
-
 Route::group(['middleware' => 'auth'], function() {
 
     Route::post('users/update', 'UserController@updateUser')->name('users.update');
+
+    Route::get('/users/profile/me', 'UserController@getMyProfile')->name('users.profile.me');
 });
 
 /**

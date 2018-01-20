@@ -8,6 +8,7 @@ use Auth;
 use App\Post;
 use App\Comment;
 use App\Guest;
+use App\User;
 
 class PostController extends Controller
 {
@@ -21,7 +22,12 @@ class PostController extends Controller
     public function __construct(PostLike $postLike)
     {
         $this->PostLike = $postLike;
-        $this->user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+
+        $this->middleware(function($request, $next) {
+            $this->user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+
+            return $next($request);
+        });
     }
 
     /**
@@ -71,6 +77,7 @@ class PostController extends Controller
         $likes = array();
         $numberOfComments = array();
         $firstComments = array();
+        $profilePictureUrls = array();
 
         foreach($posts as $post) {
             $like = PostLike::getLike($post->id);
@@ -81,6 +88,9 @@ class PostController extends Controller
 
             $numberOfCommentsForThePost = Comment::getNumberOfCommentsForPost($post->id);
             array_push($numberOfComments, $numberOfCommentsForThePost);
+
+            $profilePictureUrl = User::getProfilePictureUrlWithId($post->user_id, array('width' => 50, 'height' => 50));
+            array_push($profilePictureUrls, $profilePictureUrl);
         }
 
         $response = array(
@@ -88,7 +98,8 @@ class PostController extends Controller
             'posts' => $posts,
             'likes' => $likes,
             'numberOfComments' => $numberOfComments,
-            'firstComments' => $firstComments
+            'firstComments' => $firstComments,
+            'profilePictureUrls' => $profilePictureUrls
         );
 
         return response()->json($response);
