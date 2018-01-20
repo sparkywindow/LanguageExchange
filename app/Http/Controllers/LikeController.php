@@ -25,8 +25,11 @@ class LikeController extends Controller
      */
     public function __construct()
     {
-        $this->user = (Auth::user() === NULL) ? new Guest() : Auth::user();
+        $this->middleware(function($request, $next) {
+            $this->user = (Auth::user() === NULL) ? new Guest() : Auth::user();
 
+            return $next($request);
+        });
     }
 
     public function like(Request $request)
@@ -46,12 +49,21 @@ class LikeController extends Controller
         return response()->json($response);
     }
 
-    public function unlike(int $targetId, int $userId, string $likeType) : int
+    public function unlike(Request $request)
     {
-        if($likeType === LikeController::COMMENT_TYPE)
-            CommentLike::unlike($targetId, $userId);
-        else
-            PostLike::unlike($targetId, $userId);
+        $this->validate($request, [
+            'likeType' => 'required|max:2048',
+            'targetId' => 'required|max:2048',
+        ]);
+
+        $like = ($request->likeType === LikeController::COMMENT_TYPE) ? new CommentLike() : new PostLike();
+        $like = $like->unlike($request->targetId, $this->user->id);
+
+        $response = array(
+            'status' => 'success',
+            'like' => $like,
+        );
+        return response()->json($response);
     }
 
 

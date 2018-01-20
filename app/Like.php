@@ -38,7 +38,7 @@ abstract class Like extends Model
         return $like;
     }
 
-    public function unlike(int $targetId, int $userId) : bool
+    public function unlike(int $targetId, int $userId) : Like
     {
         $like = $this->getLike($targetId);
 
@@ -48,7 +48,9 @@ abstract class Like extends Model
 
         $like->user_names_json = json_encode($names);
 
-        return $this->saveLike($like, $targetId);
+        $like->save();
+
+        return $like;
     }
 
     public function checkIfLiked(int $targetId, int $userId) :bool

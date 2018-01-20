@@ -7,7 +7,7 @@ Vue.component('like', {
 
     template:   '<div class="likeComponentGroup">' +
     '               <div> Likes : {{ numberoflikes }} </div>' +
-    '               <div align="center" v-on:click="like" v-bind:class="computedClass"> 좋아요 </div>' +
+    '               <div align="center" v-on:click="buttonPressed" v-bind:class="computedClass"> 좋아요 </div>' +
     '           </div>',
     props: ['postid', 'pressed', 'user', 'numberoflikes'],
     computed: {
@@ -25,12 +25,7 @@ Vue.component('like', {
             this.pressed = !this.pressed;
             console.log(this.user.name);
         },
-        like: function() {
-
-            //toggle like button
-            this.pressed = !this.pressed;
-
-            this.numberoflikes++;
+        buttonPressed: function() {
 
             if (this.user.name === 'Guest') {
 
@@ -38,10 +33,19 @@ Vue.component('like', {
                 return;
             }
 
-            postId = this.postid;
+            //toggle like button
+            this.pressed = !this.pressed;
 
-            //@todo depending on press or unpress, we need to send different request
+            //depending on press or unpress, we need to send different request
+            if(this.pressed === true)
+                this.like();
+            else
+                this.unlike();
 
+        },
+        like: function() {
+
+            this.numberoflikes++;
             //like the post
             $.ajax({
                 url: '/likes/like',
@@ -49,7 +53,26 @@ Vue.component('like', {
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content'),
                     likeType: 'post',
-                    targetId: postId,
+                    targetId: this.postid,
+                },
+                dataType: 'JSON',
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        },
+        unlike: function () {
+
+            this.numberoflikes--;
+
+            //unlike the post
+            $.ajax({
+                url: '/likes/unlike',
+                type: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    likeType: 'post',
+                    targetId: this.postid,
                 },
                 dataType: 'JSON',
                 success: function (data) {
@@ -64,13 +87,12 @@ var app = new Vue({
     el: '#postlist',
     mounted: function() {
         this.loadData();
-        console.log("mounted");
     },
     data: {
         sparkyData:'sparkyverysparky',
-        likeButton:'',
         posts: [],
         numberOfLikes: [],
+        currentUserLikes: [],
         user: [],
         numberOfComments: [],
         firstComments: [],
@@ -95,13 +117,21 @@ var app = new Vue({
                     this.numberOfComments = data.numberOfComments;
                     this.firstComments = data.firstComments;
                     this.profilePictureUrls = data.profilePictureUrls;
-                    this.getNumberOfLikes(data.likes);
+                    this.setLikes(data.likes, this);
                 }.bind(this)
             });
         },
-        getNumberOfLikes: function(likes) {
+        setLikes: function(likes, that) {
+
+            //number of likes for each post
             var numberOfLikes = [];
+
+            //Whether the current user liked each post
+            var currentUserLikes = [];
+
             likes.forEach(function(like) {
+
+                currentUserLikes.push(Number(JSON.parse(like.user_names_json).includes(that.user.id) === true));
 
                 if (like !== undefined && like !== null)
                     numberOfLikes.push(JSON.parse(like.user_names_json).length);
@@ -109,6 +139,7 @@ var app = new Vue({
                     numberOfLikes.push(0);
             })
             this.numberOfLikes = numberOfLikes;
+            this.currentUserLikes = currentUserLikes;
         },
         testorr: function(fromChild) {
             console.log(fromChild);

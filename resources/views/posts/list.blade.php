@@ -28,7 +28,7 @@
         <div id="postlist">
             <div v-cloak>
                 <div v-for="(post, index) in posts">
-                    <div align="left" style="max-width: 400px; overflow:auto;  word-wrap: break-word; background-color: #fcfdfd; margin-left:10px; margin-right:10px; margin-top:10px; border-radius:10px; border:3px; border-style:solid; border-color: #d4d4d4; padding:5px;">
+                    <div align="left" class="post">
                         <img v-bind:src="profilePictureUrls[index]" style="border-radius:30px">
                         @{{ user.name }}
 
@@ -38,7 +38,7 @@
                         </a>
 
                         {{-- like # and button group --}}
-                        <like :postid="post.id" v-on:test="testorr" :pressed="likeButton" :user="user" :numberoflikes="numberOfLikes[index]"></like>
+                        <like :postid="post.id" v-on:test="testorr" :pressed="currentUserLikes[index]" :user="user" :numberoflikes="numberOfLikes[index]"></like>
 
                         {{-- comment # and save button group --}}
                         <div class="commentAndSaveGroup">

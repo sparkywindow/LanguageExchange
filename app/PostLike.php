@@ -36,14 +36,4 @@ class PostLike extends Like
         return $like;
     }
 
-//    static function saveLike(Like $like, int $targetId) : bool
-//    {
-//        $like = PostLike::getLike($targetId);
-//
-//        return PostLike::where('target_id', $targetId)->update(array(
-//            'id' => $like->id,
-//            'target_id' => $like->target_id,
-//            'user_names_json' => $like->user_names_json
-//        ));
-//    }
 }
